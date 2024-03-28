@@ -18,3 +18,18 @@ pip install -r requirements.txt
 
 Запускать main.py либо через IDE, либо в cmd:<br />
 python .path/main.py
+
+
+Дерево проекта:
+app/
+├── __init__.py
+├── patterns.py
+├── telegramBot.py
+├── data/
+│   └── data.xlsx
+├── venv/
+├── .gitignore
+├── config.py
+├── main.py
+├── README.md
+└── requirements.txt
