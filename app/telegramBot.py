@@ -12,10 +12,11 @@ class TelegramBot:
     def __init__(self, token: str) -> None:
         self.token = token
         self.bot = telebot.TeleBot(token)
-        self.df = self.load_data()
-        self.authorized_users = self.load_authorized_users()
+        self.df: pd.DataFrame = self.load_data()
+        self.authorized_users: List[int] = self.load_authorized_users()
         self.initialize_handlers()
         self.initialize_callbacks()
+        print('..::Bot connected::..')
         
             
     def is_user_authorized(self, user_id: int) -> bool:
@@ -23,6 +24,14 @@ class TelegramBot:
     
     
     def initialize_handlers(self) -> None:
+        
+        @self.bot.message_handler(commands=['start'])
+        def handle_welcome(message):
+            if self.is_user_authorized(message.from_user.id):
+                markup = create_keyboard_menu()
+                self.bot.send_message(message.chat.id, "Выберите опцию:", reply_markup=markup)
+            else:
+                self.bot.send_message(message.chat.id, "Вы не авторизованы. Пожалуйста, авторизуйтесь сначала. /authorize")
         
         @self.bot.message_handler(commands=['authorize'])
         def handle_register(message):
@@ -87,7 +96,7 @@ class TelegramBot:
     
     
     def load_authorized_users(self) -> List[int]:
-        authorized_users = []
+        authorized_users: List[int] = []
         for user in self.df.itertuples():
             if user.telegram_id != -1:
                 authorized_users.append(user.telegram_id)
@@ -96,7 +105,7 @@ class TelegramBot:
     
     def update_excel_spreadsheet(self) -> bool:
         try:
-            self.df.to_excel('../data/data.xlsx')
+            self.df.to_excel('./data/data.xlsx', index=False)
             return True
         except Exception as e:
             print('Error updating', e)
@@ -132,7 +141,7 @@ class TelegramBot:
                 self.bot.reply_to(message, "Вы уже зарегистрированы.")
             else:
                 self.bot.reply_to(message, f"Такого сотрудника нет: {message.text}\nПопробуйте ещераз")
-                msg = self.bot.send_message(message.chat.id, "Введите ваше в формате Имя Фамилия (Пример: Иван Иванов).")
+                msg = self.bot.send_message(message.chat.id, "Введите ваше ФИО в формате < Имя Фамилия > (Пример: Иван Иванов).")
                 self.bot.register_next_step_handler(msg, self.process_register_step)
         except Exception as e:
             self.bot.reply_to(message, 'Ошибка при регистрации.')
@@ -163,6 +172,7 @@ class TelegramBot:
             pattern = f"{user.name_user}, Вы прибываете в город {city}, {airport} в {arrival_time}.\nВас будет встречать {user.maintainer}.\nВаш номер рейса: {flight_number}"
         return pattern
     
+    
     def get_departure_user(self, user_id: int) -> str:
     
         user = self.df[self.df['telegram_id'] == user_id].squeeze().T
@@ -172,6 +182,7 @@ class TelegramBot:
             city, airport, arrival_time, flight_number = user.departure.split(',')
             pattern = f"{user.name_user}, Вы уезжаете в город {city}, {airport} в {arrival_time}.\nВаш номер рейса: {flight_number}"
         return pattern
+
 
     def get_hotel_user(self, user_id: int) -> str:
         
