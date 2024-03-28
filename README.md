@@ -20,16 +20,16 @@ pip install -r requirements.txt
 python .path/main.py
 
 
-Дерево проекта:
-app/
-├── __init__.py
-├── patterns.py
-├── telegramBot.py
-├── data/
-│   └── data.xlsx
-├── venv/
-├── .gitignore
-├── config.py
-├── main.py
-├── README.md
-└── requirements.txt
+Дерево проекта:<br />
+app/<br />
+├── __init__.py<br />
+├── patterns.py<br />
+├── telegramBot.py<br />
+├── data/<br />
+│   └── data.xlsx<br />
+├── venv/<br />
+├── .gitignore<br />
+├── config.py<br />
+├── main.py<br />
+├── README.md<br />
+└── requirements.txt<br />
